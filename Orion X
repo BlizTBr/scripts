@@ -420,16 +420,6 @@ local NotificationHolder = SetProps(SetChildren(MakeElement("TFrame"), {
 	Parent = Orion
 })
 
-task.spawn(function() 
-	for i = 0, 100 do
-		if getgenv().key == "Xana" then
-			while true do end
-		end
-
-		task.wait(0.1)
-	end
-end)
-
 function OrionLib:MakeNotification(NotificationConfig)
 	spawn(function()
 		NotificationConfig.Name = NotificationConfig.Name or "Notification"
