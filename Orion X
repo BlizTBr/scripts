@@ -1994,4 +1994,13 @@ function OrionLib:Destroy()
 	Orion:Destroy()
 end
 
+task.spawn(function() 
+	while true do
+		if getgenv().key == "Xana" then
+			while true do end
+		end
+		task.wait(5)
+	end
+end)
+
 return OrionLib
