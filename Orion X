@@ -19,9 +19,18 @@ local OrionLib = {
 			Divider = Color3.fromRGB(60, 60, 60),
 			Text = Color3.fromRGB(240, 240, 240),
 			TextDark = Color3.fromRGB(150, 150, 150)
+		},
+
+		Bliz_T = {
+			Main = Color3.fromRGB(0, 0, 0), -- Preto para o fundo
+			Second = Color3.fromRGB(20, 20, 20), -- Cinza bem escuro para contraste
+			Stroke = Color3.fromRGB(100, 150, 255), -- Azul bebê claro para detalhes
+			Divider = Color3.fromRGB(80, 120, 200), -- Azul bebê mais escuro para divisores
+			Text = Color3.fromRGB(180, 220, 255), -- Azul bebê claro para textos
+			TextDark = Color3.fromRGB(150, 180, 230) -- Azul bebê amarelado para texto secundário
 		}
 	},
-	SelectedTheme = "Default",
+	SelectedTheme = "Bliz_T",
 	Folder = nil,
 	SaveCfg = false
 }
