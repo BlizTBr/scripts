@@ -61,7 +61,7 @@ local Modal = Instance.new("TextButton")
 
 local FocusDrag = nil
 
-Orion.Name = "Orion"
+Orion.Name = "OrionBliz"
 
 getgenv().gethui = function() return game.CoreGui end
 
