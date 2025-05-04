@@ -5,6 +5,7 @@ local LocalPlayer = game:GetService("Players").LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 local HttpService = game:GetService("HttpService")
 local CoreGui = game:GetService("CoreGui")
+local PS = game:GetService("Players")
 
 local OrionLib = {
 	Elements = {},
@@ -1431,6 +1432,337 @@ function OrionLib:MakeWindow(WindowConfig)
 				return Dropdown
 			end
 
+			function ElementFunction:AddPlayersDropdown(DropdownConfig)
+				DropdownConfig = DropdownConfig or {}
+				DropdownConfig.Name = DropdownConfig.Name or "Dropdown"
+				DropdownConfig.Options = DropdownConfig.Options or {}
+				DropdownConfig.RemoveDp = DropdownConfig.RemoveDP or false
+				DropdownConfig.Default = DropdownConfig.Default or ""
+				DropdownConfig.Callback = DropdownConfig.Callback or function() end
+				DropdownConfig.Flag = DropdownConfig.Flag or nil
+				DropdownConfig.MultipleSelection = DropdownConfig.MultipleSelection or false
+				DropdownConfig.Save = DropdownConfig.Save or false
+
+				local Dropdown = {Value = DropdownConfig.Default, Options = DropdownConfig.Options, Buttons = {}, Toggled = false, Type = "Dropdown", Save = DropdownConfig.Save, MultipleSelection = DropdownConfig.MultipleSelection}
+				local MaxElements = 3
+
+				if not table.find(Dropdown.Options, Dropdown.Value) then
+					Dropdown.Value = "..."
+				end
+
+				local SelectedValues = {}
+				local Options = 0
+
+				local DropdownList = MakeElement("List")
+
+				local DropdownContainer = AddThemeObject(SetProps(SetChildren(MakeElement("ScrollFrame", Color3.fromRGB(40, 40, 40), 4), {
+					DropdownList
+				}), {
+					Parent = ItemParent,
+					Position = UDim2.new(0, 0, 0, 38),
+					Size = UDim2.new(1, 0, 1, -38),
+					ClipsDescendants = true
+				}), "Divider")
+
+				local Click = SetProps(MakeElement("Button"), {
+					Size = UDim2.new(1, 0, 1, 0)
+				})
+
+				local DropdownFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 5), {
+					Size = UDim2.new(1, 0, 0, 38),
+					Parent = ItemParent,
+					ClipsDescendants = true
+				}), {
+					DropdownContainer,
+					SetProps(SetChildren(MakeElement("TFrame"), {
+						AddThemeObject(SetProps(MakeElement("Label", DropdownConfig.Name, 15), {
+							Size = UDim2.new(1, -12, 1, 0),
+							Position = UDim2.new(0, 12, 0, 0),
+							Font = Enum.Font.GothamBold,
+							Name = "Content"
+						}), "Text"),
+						AddThemeObject(SetProps(MakeElement("Image", "rbxassetid://7072706796"), {
+							Size = UDim2.new(0, 20, 0, 20),
+							AnchorPoint = Vector2.new(0, 0.5),
+							Position = UDim2.new(1, -30, 0.5, 0),
+							ImageColor3 = Color3.fromRGB(240, 240, 240),
+							Name = "Ico"
+						}), "TextDark"),
+						AddThemeObject(SetProps(MakeElement("Label", "Selected", 13), {
+							Size = UDim2.new(1, -40, 1, 0),
+							Font = Enum.Font.Gotham,
+							Name = "Selected",
+							TextXAlignment = Enum.TextXAlignment.Right
+						}), "TextDark"),
+						AddThemeObject(SetProps(MakeElement("Frame"), {
+							Size = UDim2.new(1, 0, 0, 1),
+							Position = UDim2.new(0, 0, 1, -1),
+							Name = "Line",
+							Visible = false
+						}), "Stroke"), 
+						Click
+					}), {
+						Size = UDim2.new(1, 0, 0, 38),
+						ClipsDescendants = true,
+						Name = "F"
+					}),
+					AddThemeObject(MakeElement("Stroke"), "Stroke"),
+					MakeElement("Corner")
+				}), "Second")
+
+				AddConnection(DropdownList:GetPropertyChangedSignal("AbsoluteContentSize"), function()
+					DropdownContainer.CanvasSize = UDim2.new(0, 0, 0, DropdownList.AbsoluteContentSize.Y)
+
+					if Options <= MaxElements then
+						TweenService:Create(DropdownFrame,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = Dropdown.Toggled and UDim2.new(1, 0, 0, 38 + (Options * 45)) or UDim2.new(1, 0, 0, 38)}):Play()
+					end
+				end)
+
+				local function RemoveOption(Option)
+					if Dropdown.Buttons[Option] then
+						local n = table.find(SelectedValues, Option)
+
+						if n then
+							Dropdown.Buttons[Option].State.Visible = true
+							TweenService:Create(Dropdown.Buttons[Option],TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{BackgroundColor3 = Color3.fromRGB(200, 80, 80)}):Play()
+						else
+							Dropdown.Buttons[Option]:Destroy()
+							Dropdown.Buttons[Option] = nil
+							Options = Options - 1
+						end
+					end
+				end
+
+				local function AddOption(Option)
+					local Player_Name = Option.Name
+					local Player_Display = Option.DisplayName
+					local UId = Option.UserId
+
+					local Option = Player_Name
+
+					if not Dropdown.Buttons[Option] then
+						local OptionBtn = AddThemeObject(SetProps(SetChildren(MakeElement("Button", Color3.fromRGB(40, 40, 40)), {
+							MakeElement("Corner", 0, 6),
+							SetProps(MakeElement("Image", "https://www.roblox.com/headshot-thumbnail/image?userId=".. UId .."&width=420&height=420&format=png"), {
+								Size = UDim2.new(0, 40, 0, 40),
+								AnchorPoint = Vector2.new(0.5, 0.5),
+								Position = UDim2.new(0.05, 0, 0.5, 0),
+								ImageColor3 = Color3.fromRGB(240, 240, 240),
+								Name = "Icon"
+							}),
+
+							SetProps(MakeElement("Image", "rbxassetid://118759916599176"), {
+								Size = UDim2.new(0, 35, 0, 35),
+								AnchorPoint = Vector2.new(0.5, 0.5),
+								Position = UDim2.new(0.94, 0, 0.5, 0),
+								ImageColor3 = Color3.fromRGB(41, 0, 5),
+								Name = "State",
+								Visible = false
+							}),
+
+							AddThemeObject(SetProps(MakeElement("Label", "@" .. Option, 13, 0.4), {
+								Position = UDim2.new(0.135, 0, 0, 7),
+								Size = UDim2.new(1, -10, 1, 0),
+								Name = "Title"
+							}), "Text"),
+
+							AddThemeObject(SetProps(MakeElement("Label", Player_Display, 17, 0.4), {
+								Position = UDim2.new(0.135, 0, 0, -5),
+								Size = UDim2.new(1, -8, 1, 0),
+								Name = "Subtitle"
+							}), "Text"),
+						}), {
+							Parent = DropdownContainer,
+							Size = UDim2.new(1, 0, 0, 45),
+							BackgroundTransparency = 1,
+							ClipsDescendants = true
+						}), "Divider")
+
+						AddConnection(OptionBtn.MouseButton1Click, function()
+							Dropdown:Set(Option)
+							SaveCfg(game.GameId)
+						end)
+
+						Dropdown.Buttons[Option] = OptionBtn
+						Options = Options + 1
+					else
+						local n = table.find(SelectedValues, Option)
+
+						if n then
+							Dropdown.Buttons[Option].State.Visible = false
+							TweenService:Create(Dropdown.Buttons[Option],TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{BackgroundColor3 = OrionLib.Themes[OrionLib.SelectedTheme]["Divider"]}):Play()
+						else
+							Dropdown.Buttons[Option]:Destroy()
+							Dropdown.Buttons[Option] = nil
+							Options = Options - 1
+						end
+					end
+				end
+
+				for _, p in pairs(PS:GetPlayers()) do
+					AddOption(p)
+				end
+
+				PS.PlayerAdded:Connect(function(p) 
+					AddOption(p)
+				end)
+
+				PS.PlayerRemoving:Connect(function(p) 
+					RemoveOption(p.Name)
+				end)
+
+				local function DeleteAllDisconnectedPlayers()
+					for i, v in pairs(Dropdown.Buttons) do
+						if v and v:FindFirstChild("State") and v["State"].Visible then
+							Dropdown.Buttons[i]:Destroy()
+							Dropdown.Buttons[i] = nil
+							Options = Options - 1
+						end
+					end
+				end
+
+				function Dropdown:Refresh() end
+
+				function Dropdown:Set(Value, Once)
+					local n = table.find(SelectedValues, Value)
+					local text = ""
+					local Button = Dropdown.Buttons[Value]
+
+					if not Button then
+						for i = 0, 10 do
+							if Dropdown.Buttons[Value] then
+								Button = Dropdown.Buttons[Value]
+								break
+							end
+							wait(0.15)
+						end
+					end
+					
+					if Button then
+						if Dropdown.MultipleSelection then
+							if not n then
+								print("Adicionado")
+								table.insert(SelectedValues, Value)
+								DropdownFrame.F.Selected.Text = Dropdown.Value
+								TweenService:Create(Dropdown.Buttons[Value],TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{BackgroundTransparency = 0.5}):Play()
+								TweenService:Create(Dropdown.Buttons[Value].Title,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{TextTransparency = 0}):Play()
+							elseif n and not Once then
+								print("Removido")
+								table.remove(SelectedValues, n)
+		
+								if Dropdown.Buttons[Value].State.Visible then
+									Dropdown.Buttons[Value]:Destroy()
+									Dropdown.Buttons[Value] = nil
+									Options = Options - 1
+								else
+									TweenService:Create(Dropdown.Buttons[Value],TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{BackgroundTransparency = 1}):Play()
+									TweenService:Create(Dropdown.Buttons[Value].Title,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{TextTransparency = 0.4}):Play()
+								end
+							end
+		
+							for i, v in pairs(SelectedValues) do
+								if #SelectedValues == 1 then
+									text = text .. v
+								elseif i > 3 then
+									text = text .. "..."
+									break
+								else
+									text = text .. v .. ", "
+								end
+							end
+							
+							Dropdown.Value = Value
+							DropdownFrame.F.Selected.Text = text
+		
+							return DropdownConfig.Callback(SelectedValues)
+						else
+							table.clear(SelectedValues); table.insert(SelectedValues, Value)
+
+							DeleteAllDisconnectedPlayers()
+
+							for _, v in pairs(Dropdown.Buttons) do
+								TweenService:Create(v,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{BackgroundTransparency = 1}):Play()
+								TweenService:Create(v.Title,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{TextTransparency = 0.4}):Play()
+							end
+
+							if Dropdown.Buttons[Value] then
+								TweenService:Create(Dropdown.Buttons[Value],TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{BackgroundTransparency = 0.5}):Play()
+								TweenService:Create(Dropdown.Buttons[Value].Title,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{TextTransparency = 0}):Play()
+								
+								Dropdown.Value = Value
+								DropdownFrame.F.Selected.Text = Dropdown.Value
+							else
+								Dropdown.Value = nil
+								DropdownFrame.F.Selected.Text = ""
+							end
+
+							return DropdownConfig.Callback(Dropdown.Value)
+						end
+					end
+				end
+
+				--[[
+				function Dropdown:SetOnce(Value)
+					local n = table.find(SelectedValues, Value)
+					local text = ""
+					local Button; 
+
+					for i = 0, 10 do
+						if Dropdown.Buttons[Value] then
+							Button = Dropdown.Buttons[Value]
+							break
+						end
+						wait(0.15)
+					end
+
+					if Button then
+						if not n then
+							print("Adicionado")
+							table.insert(SelectedValues, Value)
+							DropdownFrame.F.Selected.Text = Dropdown.Value
+							TweenService:Create(Dropdown.Buttons[Value],TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{BackgroundTransparency = 0.5}):Play()
+							TweenService:Create(Dropdown.Buttons[Value].Title,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{TextTransparency = 0}):Play()
+						end
+	
+						for i, v in pairs(SelectedValues) do
+							if #SelectedValues == 1 then
+								text = text .. v
+							elseif i > 3 then
+								text = text .. "..."
+								break
+							else
+								text = text .. v .. ", "
+							end
+						end
+	
+						Dropdown.Value = Value
+						DropdownFrame.F.Selected.Text = text
+	
+						return DropdownConfig.Callback(SelectedValues)
+					end
+				end
+				]]--
+
+				AddConnection(Click.MouseButton1Click, function()
+					Dropdown.Toggled = not Dropdown.Toggled
+					DropdownFrame.F.Line.Visible = Dropdown.Toggled
+					TweenService:Create(DropdownFrame.F.Ico,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Rotation = Dropdown.Toggled and 180 or 0}):Play()
+
+					if Options > MaxElements then
+						TweenService:Create(DropdownFrame,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = Dropdown.Toggled and UDim2.new(1, 0, 0, 38 + (MaxElements * 45)) or UDim2.new(1, 0, 0, 38)}):Play()
+					else
+						TweenService:Create(DropdownFrame,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = Dropdown.Toggled and UDim2.new(1, 0, 0, 38 + (Options * 45)) or UDim2.new(1, 0, 0, 38)}):Play()
+					end
+					
+				end)
+
+				if DropdownConfig.Flag then				
+					OrionLib.Flags[DropdownConfig.Flag] = Dropdown
+				end
+				
+				return Dropdown
+			end
+
 			function ElementFunction:AddDropdown(DropdownConfig)
 				DropdownConfig = DropdownConfig or {}
 				DropdownConfig.Name = DropdownConfig.Name or "Dropdown"
@@ -2183,7 +2515,6 @@ function OrionLib:Destroy()
 end
 
 --[[
-
 local Window = OrionLib:MakeWindow({Name = "Fling Things and People", HidePremium = true, SaveConfig = true, ConfigFolder = "FTAPConfig", IntroEnabled = false, KeyToOpenWindow = "M", FreeMouse = true})
 
 local Main_Tab = Window:MakeTab({
@@ -2192,15 +2523,11 @@ local Main_Tab = Window:MakeTab({
 	PremiumOnly = false
 })
 
-Main_Tab:AddMultipleDropdown({
+Main_Tab:AddPlayersDropdown({
 	Name = "Plot",
 	Default = "Witch House",
-	Options = {"Witch House", "Lumber House", "Common House", "American House", "Chinese House"},
+	MultipleSelection = true,
 	Callback = function(Value)
-		print("------------")
-		for i, v in pairs(Value) do
-			print(typeof(v), v)
-		end
 	end    
 })
 ]]--
