@@ -6,6 +6,8 @@ local Mouse = LocalPlayer:GetMouse()
 local HttpService = game:GetService("HttpService")
 local CoreGui = game:GetService("CoreGui")
 local PS = game:GetService("Players")
+local Players = PS
+local UserService = game:GetService("UserService")
 
 local OrionLib = {
 	Elements = {},
@@ -516,8 +518,6 @@ function OrionLib:Init()
 	end	
 end
 
-
-
 function OrionLib:MakeWindow(WindowConfig)
 	local FirstTab = true
 	local Minimized = false
@@ -929,6 +929,8 @@ function OrionLib:MakeWindow(WindowConfig)
 			Container.Visible = true   
 		end)
 
+		
+
 		local function GetElements(ItemParent)
 			local ElementFunction = {}
 			function ElementFunction:AddLabel(Text)
@@ -952,6 +954,81 @@ function OrionLib:MakeWindow(WindowConfig)
 				end
 				return LabelFunction
 			end
+
+			function ElementFunction:AddPlayerParagraph(userId)
+				userId = userId or 0
+			
+				local displayName = "Unknown"
+				local username = "Unknown"
+			
+				local success, result = pcall(function()
+					return UserService:GetUserInfosByUserIdsAsync({userId})
+				end)
+			
+				if success and result and result[1] then
+					displayName = result[1].DisplayName or "Unknown"
+					username = result[1].Username or "Unknown"
+				end
+			
+				local ParagraphFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 5), {
+				Size = UDim2.new(1, 0, 0, 70),
+				BackgroundTransparency = 0.7,
+				Parent = ItemParent
+				}), {
+				SetProps(MakeElement("Image", "", 0), {
+				Name = "Avatar",
+				Size = UDim2.new(0, 60, 0, 60),
+				Position = UDim2.new(0, 5, 0, 5),
+				BackgroundTransparency = 1,
+				Image = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. userId .. "&width=420&height=420&format=png"
+				}),
+			
+				AddThemeObject(SetProps(MakeElement("Label", displayName, 15), {
+				Name = "DisplayName",
+				Size = UDim2.new(1, -70, 0, 20),
+				Position = UDim2.new(0, 70, 0, 10),
+				Font = Enum.Font.GothamBold,
+				TextXAlignment = Enum.TextXAlignment.Left
+				}), "Text"),
+			
+				AddThemeObject(SetProps(MakeElement("Label", username, 13), {
+				Name = "Username",
+				Size = UDim2.new(1, -70, 0, 20),
+				Position = UDim2.new(0, 70, 0, 35),
+				Font = Enum.Font.GothamSemibold,
+				TextXAlignment = Enum.TextXAlignment.Left
+				}), "TextDark"),
+			
+				AddThemeObject(MakeElement("Stroke"), "Stroke")
+				}), "Second")
+			
+				local PlayerParagraph = {}
+				
+				function PlayerParagraph:Set(newUserId)
+					newUserId = newUserId or 0
+				
+					local dname = "Unknown"
+					local uname = "Unknown"
+				
+					local ok, data = pcall(function()
+						return UserService:GetUserInfosByUserIdsAsync({newUserId})
+					end)
+				
+					if ok and data and data[1] then
+						dname = data[1].DisplayName or "Unknown"
+						uname = data[1].Username or "Unknown"
+					end
+				
+					ParagraphFrame.DisplayName.Text = dname
+					ParagraphFrame.DisplayName.Visible = true
+					ParagraphFrame.Username.Text = uname
+					ParagraphFrame.Username.Position = UDim2.new(0, 70, 0, 35)
+					ParagraphFrame.Avatar.Image = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. newUserId .. "&width=420&height=420&format=png"
+				end
+			
+				return PlayerParagraph
+			end
+
 			function ElementFunction:AddParagraph(Text, Content)
 				Text = Text or "Text"
 				Content = Content or "Content"
@@ -989,7 +1066,8 @@ function OrionLib:MakeWindow(WindowConfig)
 					ParagraphFrame.Content.Text = ToChange
 				end
 				return ParagraphFunction
-			end    
+			end
+
 			function ElementFunction:AddButton(ButtonConfig)
 				ButtonConfig = ButtonConfig or {}
 				ButtonConfig.Name = ButtonConfig.Name or "Button"
@@ -1044,7 +1122,8 @@ function OrionLib:MakeWindow(WindowConfig)
 				end	
 
 				return Button
-			end    
+			end
+
 			function ElementFunction:AddToggle(ToggleConfig)
 				ToggleConfig = ToggleConfig or {}
 				ToggleConfig.Name = ToggleConfig.Name or "Toggle"
@@ -1126,7 +1205,8 @@ function OrionLib:MakeWindow(WindowConfig)
 					OrionLib.Flags[ToggleConfig.Flag] = Toggle
 				end	
 				return Toggle
-			end  
+			end
+
 			function ElementFunction:AddSlider(SliderConfig)
 				SliderConfig = SliderConfig or {}
 				SliderConfig.Name = SliderConfig.Name or "Slider"
@@ -1919,6 +1999,7 @@ function OrionLib:MakeWindow(WindowConfig)
 
 				return Dropdown
 			end
+
 			function ElementFunction:AddBind(BindConfig)
 				BindConfig.Name = BindConfig.Name or "Bind"
 				BindConfig.Default = BindConfig.Default or Enum.KeyCode.Unknown
@@ -2040,7 +2121,8 @@ function OrionLib:MakeWindow(WindowConfig)
 					OrionLib.Flags[BindConfig.Flag] = Bind
 				end
 				return Bind
-			end  
+			end
+
 			function ElementFunction:AddTextbox(TextboxConfig)
 				TextboxConfig = TextboxConfig or {}
 				TextboxConfig.Name = TextboxConfig.Name or "Textbox"
@@ -2119,7 +2201,8 @@ function OrionLib:MakeWindow(WindowConfig)
 				AddConnection(Click.MouseButton1Down, function()
 					TweenService:Create(TextboxFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(OrionLib.Themes[OrionLib.SelectedTheme].Second.R * 255 + 6, OrionLib.Themes[OrionLib.SelectedTheme].Second.G * 255 + 6, OrionLib.Themes[OrionLib.SelectedTheme].Second.B * 255 + 6)}):Play()
 				end)
-			end 
+			end
+
 			function ElementFunction:AddColorpicker(ColorpickerConfig)
 				ColorpickerConfig = ColorpickerConfig or {}
 				ColorpickerConfig.Name = ColorpickerConfig.Name or "Colorpicker"
@@ -2378,7 +2461,8 @@ function OrionLib:MakeWindow(WindowConfig)
 					OrionLib.Flags[ColorpickerConfig.Flag] = Colorpicker
 				end
 				return Colorpicker
-			end  
+			end
+
 			return ElementFunction   
 		end	
 
@@ -2528,8 +2612,19 @@ Main_Tab:AddPlayersDropdown({
 	Default = "Witch House",
 	MultipleSelection = true,
 	Callback = function(Value)
-	end    
+	end
 })
+
+local Window = OrionLib:MakeWindow({Name = "Fling Things and People", HidePremium = true, SaveConfig = true, ConfigFolder = "FTAPConfig", IntroEnabled = false, KeyToOpenWindow = "M", FreeMouse = true})
+
+local Tab = Window:MakeTab({
+	Name = "Tab 1",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+Tab:AddParagraph(":crown: owners","make the final decisions and keep the script alive")
+Tab:AddPlayerParagraph(90063030)
 ]]--
 
 return OrionLib
