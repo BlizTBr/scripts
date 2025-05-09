@@ -7,6 +7,7 @@ local PlayerService = game:GetService("Players")
 local UserService = game:GetService("UserService")
 
 local LocalPlayer = PlayerService.LocalPlayer
+print(LocalPlayer)
 local Mouse = LocalPlayer:GetMouse()
 
 local OrionLib = {
