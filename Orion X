@@ -1,13 +1,13 @@
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
-local LocalPlayer = game:GetService("Players").LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 local HttpService = game:GetService("HttpService")
 local CoreGui = game:GetService("CoreGui")
-local PS = game:GetService("Players")
-local Players = PS
+local PlayerService = game:GetService("Players")
 local UserService = game:GetService("UserService")
+
+local LocalPlayer = PlayerService.LocalPlayer
 
 local OrionLib = {
 	Elements = {},
@@ -1679,15 +1679,15 @@ function OrionLib:MakeWindow(WindowConfig)
 					end
 				end
 
-				for _, p in pairs(PS:GetPlayers()) do
+				for _, p in pairs(PlayerService:GetPlayers()) do
 					AddOption(p)
 				end
 
-				PS.PlayerAdded:Connect(function(p) 
+				PlayerService.PlayerAdded:Connect(function(p) 
 					AddOption(p)
 				end)
 
-				PS.PlayerRemoving:Connect(function(p) 
+				PlayerService.PlayerRemoving:Connect(function(p) 
 					RemoveOption(p.Name)
 				end)
 
@@ -2597,34 +2597,5 @@ end
 function OrionLib:Destroy()
 	Orion:Destroy()
 end
-
---[[
-local Window = OrionLib:MakeWindow({Name = "Fling Things and People", HidePremium = true, SaveConfig = true, ConfigFolder = "FTAPConfig", IntroEnabled = false, KeyToOpenWindow = "M", FreeMouse = true})
-
-local Main_Tab = Window:MakeTab({
-	Name = "Combat",
-	Icon = "rbxassetid://7485051715",
-	PremiumOnly = false
-})
-
-Main_Tab:AddPlayersDropdown({
-	Name = "Plot",
-	Default = "Witch House",
-	MultipleSelection = true,
-	Callback = function(Value)
-	end
-})
-
-local Window = OrionLib:MakeWindow({Name = "Fling Things and People", HidePremium = true, SaveConfig = true, ConfigFolder = "FTAPConfig", IntroEnabled = false, KeyToOpenWindow = "M", FreeMouse = true})
-
-local Tab = Window:MakeTab({
-	Name = "Tab 1",
-	Icon = "rbxassetid://4483345998",
-	PremiumOnly = false
-})
-
-Tab:AddParagraph(":crown: owners","make the final decisions and keep the script alive")
-Tab:AddPlayerParagraph(90063030)
-]]--
 
 return OrionLib
