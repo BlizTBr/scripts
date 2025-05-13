@@ -7,7 +7,6 @@ local PlayerService = game:GetService("Players")
 local UserService = game:GetService("UserService")
 
 local LocalPlayer = PlayerService.LocalPlayer
-print(LocalPlayer)
 local Mouse = LocalPlayer:GetMouse()
 
 local OrionLib = {
@@ -67,15 +66,16 @@ local FocusDrag = nil
 
 Orion.Name = "OrionBliz"
 
-getgenv().gethui = function() return game.CoreGui end
+getgenv().gethui = function() return CoreGui end
 
 if gethui then
 	Orion.Parent = gethui()
 elseif syn and syn.protect_gui then 
-	syn.protect_gui(Rayfield)
+	syn.protect_gui(Orion)
 	Orion.Parent = CoreGui
 elseif not useStudio and CoreGui:FindFirstChild("RobloxGui") then
-	Orion.Parent = CoreGui:FindFirstChild("RobloxGui")
+	print("Studio Mode!")
+	Orion.Parent = CoreGui
 elseif not useStudio then
 	Orion.Parent = CoreGui
 end
