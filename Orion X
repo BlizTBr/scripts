@@ -60,25 +60,20 @@ end
 local useStudio = RunService:IsStudio() or false
 
 local Orion = Instance.new("ScreenGui")
-local Modal = Instance.new("TextButton")
 
 local FocusDrag = nil
 
 Orion.Name = "OrionBliz"
 
-getgenv().gethui = function() return CoreGui end
+local ProtectGui = protectgui or (syn and syn.protect_gui) or function() end
 
-if gethui then
-	Orion.Parent = gethui()
-elseif syn and syn.protect_gui then 
-	syn.protect_gui(Orion)
-	Orion.Parent = CoreGui
-elseif not useStudio and CoreGui:FindFirstChild("RobloxGui") then
-	print("Studio Mode!")
-	Orion.Parent = CoreGui
-elseif not useStudio then
-	Orion.Parent = CoreGui
-end
+local GUIParent = gethui and gethui() or (game.CoreGui or game.Players.LocalPlayer:WaitForChild("PlayerGui"))
+
+Orion.Parent = GUIParent
+
+local ProtectGui = protectgui or (syn and syn.protect_gui) or function() end
+
+ProtectGui(Orion)
 
 if gethui then
 	for _, Interface in ipairs(gethui():GetChildren()) do
@@ -275,7 +270,7 @@ end
 local WhitelistedMouse = {Enum.UserInputType.MouseButton1, Enum.UserInputType.MouseButton2,Enum.UserInputType.MouseButton3}
 local BlacklistedKeys = {Enum.KeyCode.Unknown,Enum.KeyCode.W,Enum.KeyCode.A,Enum.KeyCode.S,Enum.KeyCode.D,Enum.KeyCode.Up,Enum.KeyCode.Left,Enum.KeyCode.Down,Enum.KeyCode.Right,Enum.KeyCode.Slash,Enum.KeyCode.Tab,Enum.KeyCode.Backspace,Enum.KeyCode.Escape}
 
-local freeMouse = Create("TextButton", {Name = "FMouse", Size = UDim2.new(), BackgroundTransparency = 1, Text = "", Position = UDim2.new(), Modal = true, Parent = Orion, Visible = false})
+local freeMouse = Create("TextButton", {Name = "FMouse", Size = UDim2.new(0,0,0,0), BackgroundTransparency = 1, Text = "", Position = UDim2.new(0,0,0,0), Modal = true, Parent = Orion, Visible = false})
 local mouselock = false
 
 local function UnlockMouse(Value)
@@ -2595,8 +2590,26 @@ function OrionLib:MakeWindow(WindowConfig)
 	return TabFunction
 end   
 
+--[[
 function OrionLib:Destroy()
 	Orion:Destroy()
 end
+
+local Window = OrionLib:MakeWindow({Name = "aaa", HidePremium = true, SaveConfig = false, ConfigFolder = "hentai", IntroEnabled = false, KeyToOpenWindow = "M", FreeMouse = true})
+
+local Main_Tab = Window:MakeTab({
+	Name = "Combat",
+	Icon = "rbxassetid://7485051715",
+	PremiumOnly = false
+})
+
+Main_Tab:AddToggle({
+	Name = "This is a toggle!",
+	Default = false,
+	Callback = function(Value)
+		print(Value)
+	end    
+})
+]]--
 
 return OrionLib
