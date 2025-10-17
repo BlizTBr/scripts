@@ -65,6 +65,8 @@ local FocusDrag = nil
 
 Orion.Name = "OrionBliz"
 
+getgenv().gethui = function() return game.CoreGui end
+
 local ProtectGui = protectgui or (syn and syn.protect_gui) or function() end
 
 local GUIParent = gethui and gethui() or (game.CoreGui or game.Players.LocalPlayer:WaitForChild("PlayerGui"))
@@ -2588,12 +2590,13 @@ function OrionLib:MakeWindow(WindowConfig)
 
 	
 	return TabFunction
-end   
+end
 
---[[
 function OrionLib:Destroy()
 	Orion:Destroy()
 end
+
+--[[
 
 local Window = OrionLib:MakeWindow({Name = "aaa", HidePremium = true, SaveConfig = false, ConfigFolder = "hentai", IntroEnabled = false, KeyToOpenWindow = "M", FreeMouse = true})
 
