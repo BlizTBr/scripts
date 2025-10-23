@@ -1,9 +1,3 @@
--- Decompiler will be improved VERY SOON!
--- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/brNTY8nX8t)
--- Decompiled on 2025-10-22 20:59:06
--- Luau version 6, Types version 3
--- Time taken: 0.029378 seconds
-
 local longstring1 = "Your bed gets lonely and cold at night and it needs your warmth to stay happy and healthy. It's vital to drool on your bed, as your bed soaks up drool to stay hydrated."
 local longstring2 = "The jukebox plays music when a button is pressed. This jukebox has all the same songs as the jukebox that spawns in the \"Music\" section of the world."
 local longstring3 = "This tractor has no attachements, so it's useless. But it does have a rollbar so you don't get crushed when it rolls over. You can drive it."
