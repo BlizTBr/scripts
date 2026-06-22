@@ -1830,7 +1830,8 @@ function OrionLib:MakeWindow(WindowConfig)
 					Type = "Toggle", Name = ToggleConfig.Name,
 					uccolor = ToggleConfig.Color ~= nil, 
 					ccolor = ToggleConfig.Color,
-					Box = nil
+					Box = nil,
+					FlagName = ToggleConfig.Flag,
 				}
 
 				local Click = SetProps(MakeElement("Button"), {
@@ -1838,6 +1839,11 @@ function OrionLib:MakeWindow(WindowConfig)
 				})
 
 				Toggle["Event"] = Click
+
+				local set_value_event = Instance.new("BindableEvent", Click)
+				set_value_event.Name = "Value"
+
+				Toggle["Event2"] = set_value_event
 
 				local accolor = ToggleConfig.Color or OrionLib.Themes[OrionLib.SelectedTheme].Accent
 
@@ -1880,14 +1886,29 @@ function OrionLib:MakeWindow(WindowConfig)
 				table.insert(OrionLib.Toggles, Toggle)
 
 				function Toggle:Set(Value)
-					local accolor = Toggle.uccolor and Toggle.ccolor or OrionLib.Themes[OrionLib.SelectedTheme].Accent
 					Toggle.Value = Value
-					TweenService:Create(ToggleBox, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Toggle.Value and accolor or OrionLib.Themes[OrionLib.SelectedTheme].Divider}):Play()
-					TweenService:Create(ToggleBox.Stroke, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Color = Toggle.Value and accolor or OrionLib.Themes[OrionLib.SelectedTheme].Stroke}):Play()
-					TweenService:Create(ToggleBox.Ico, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {ImageTransparency = Toggle.Value and 0 or 1, Size = Toggle.Value and UDim2.new(0, 20, 0, 20) or UDim2.new(0, 8, 0, 8)}):Play()
+					
+					local accolor = Toggle.uccolor and Toggle.ccolor or OrionLib.Themes[OrionLib.SelectedTheme].Accent
+					
+					vgs.TS:Create(ToggleBox, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+						BackgroundColor3 = Toggle.Value and accolor or OrionLib.Themes[OrionLib.SelectedTheme].Divider
+					}):Play()
+					vgs.TS:Create(ToggleBox.Stroke, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+						Color = Toggle.Value and accolor or OrionLib.Themes[OrionLib.SelectedTheme].Stroke
+					}):Play()
+					vgs.TS:Create(ToggleBox.Ico, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+						ImageTransparency = Toggle.Value and 0 or 1, 
+						Size = Toggle.Value and UDim2.new(0, 20, 0, 20) or UDim2.new(0, 8, 0, 8)
+					}):Play()
+					
 					Click:SetAttribute("Value", Value)
+					set_value_event:Fire(Value)
 					ToggleConfig.Callback(Toggle.Value)
-				end    
+				end
+
+				function Toggle:Set2(Value)
+					ToggleConfig.Callback(Value)
+				end
 
 				Toggle:Set(Toggle.Value)
 
