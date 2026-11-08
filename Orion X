@@ -2407,6 +2407,7 @@ function OrionLib:MakeWindow(WindowConfig)
 				DropdownConfig.Flag = DropdownConfig.Flag or nil
 				DropdownConfig.MultipleSelection = DropdownConfig.MultipleSelection or false
 				DropdownConfig.Save = DropdownConfig.Save or false
+				DropdownConfig.Filter = DropdownConfig.Filter or nil -- function(player) -> true = aparece na lista; muda? chame Dropdown:Refresh()
 
 				local Dropdown = {Value = DropdownConfig.Default, Options = DropdownConfig.Options, Buttons = {}, Toggled = false, Type = "Dropdown", Save = DropdownConfig.Save, MultipleSelection = DropdownConfig.MultipleSelection}
 				local MaxElements = 3
@@ -2656,13 +2657,23 @@ function OrionLib:MakeWindow(WindowConfig)
 
 				local TextBox_s = DropdownFrame.F:FindFirstChild("TextBoxSearch") or ""
 
-				for _, p in pairs(PlayerService:GetPlayers()) do
-					AddOption(p)
+				local function Allowed(p)
+					if not DropdownConfig.Filter then return true end
+					local ok, result = pcall(DropdownConfig.Filter, p)
+					return ok and result == true
 				end
 
-				PlayerService.PlayerAdded:Connect(function(p) 
-					AddOption(p)
-					FilterOptions(TextBox_s and TextBox_s.Text or "")
+				for _, p in pairs(PlayerService:GetPlayers()) do
+					if Allowed(p) then
+						AddOption(p)
+					end
+				end
+
+				PlayerService.PlayerAdded:Connect(function(p)
+					if Allowed(p) then
+						AddOption(p)
+						FilterOptions(TextBox_s and TextBox_s.Text or "")
+					end
 				end)
 
 				PlayerService.PlayerRemoving:Connect(function(p) 
@@ -2680,7 +2691,25 @@ function OrionLib:MakeWindow(WindowConfig)
 					end
 				end
 
-				function Dropdown:Refresh() end
+				-- Sem Filter não faz nada (como antes). Com Filter, coloca quem passou a valer e tira quem deixou.
+				-- AddOption num botão que já existe apaga ele, por isso só chama pra quem ainda não tem botão.
+				function Dropdown:Refresh()
+					if not DropdownConfig.Filter then return end
+
+					for _, p in pairs(PlayerService:GetPlayers()) do
+						local button = Dropdown.Buttons[p.Name]
+
+						if Allowed(p) then
+							if not button then
+								AddOption(p)
+							end
+						elseif button and not (button:FindFirstChild("State") and button.State.Visible) then
+							RemoveOption(p.Name)
+						end
+					end
+
+					FilterOptions(TextBox_s and TextBox_s.Text or "")
+				end
 
 				function Dropdown:Set(Value, Once)
 					local n = table.find(SelectedValues, Value)
